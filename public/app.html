@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bac 2026 — Révisions</title>
+<style>
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #555;
+    --color-text-tertiary: #999;
+    --color-background-primary: #fff;
+    --color-background-secondary: #f5f5f7;
+    --color-border-secondary: #ddd;
+    --color-border-tertiary: #eee;
+    --color-border-info: #3B82F6;
+    --border-radius-lg: 12px;
+    --border-radius-md: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); font-size: 13px; background: #f0f2f5; min-height: 100vh; }
+
+  /* TOP BAR */
+  .topbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar h1 { font-size: 16px; font-weight: 600; }
+  .topbar-user { font-size: 13px; opacity: 0.9; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .logout-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.3); }
+
+  .w { max-width: 800px; margin: 0 auto; padding: 16px 12px 40px; }
+
+  /* NAV TABS */
+  .nav { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .nt {
+    padding: 7px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary);
+    font-size: 12px; cursor: pointer; background: var(--color-background-secondary);
+    color: var(--color-text-secondary); transition: all .15s;
+  }
+  .nt.on { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); font-weight: 500; }
+  .sec { display: none; } .sec.on { display: block; }
+
+  /* PROGRESS BARS */
+  .pb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .pb-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px; }
+  .pb-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .pb-name { font-size: 12px; font-weight: 500; }
+  .pb-num { font-size: 20px; font-weight: 500; }
+  .pb-bar { height: 7px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .pb-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+  .pb-label { font-size: 10px; color: var(--color-text-tertiary); margin-top: 3px; }
+  .total-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 12px; margin-bottom: 12px; }
+  .total-bar { height: 10px; background: var(--color-background-secondary); border-radius: 5px; overflow: hidden; margin: 6px 0; }
+  .total-fill { height: 100%; border-radius: 5px; background: var(--color-text-primary); transition: width .4s; }
+
+  /* COUNTDOWN */
+  .cds { display: flex; gap: 8px; margin-bottom: 14px; }
+  .cd { flex: 1; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 10px; text-align: center; }
+  .cd-n { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .cd-l { font-size: 10px; color: var(--color-text-secondary); margin-top: 1px; }
+
+  /* CALENDAR */
+  .wk { margin-bottom: 7px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+  .wk.sprint { border: 1.5px solid #16A34A; }
+  .wk-h { padding: 6px 10px; font-size: 10px; font-weight: 500; color: var(--color-text-secondary); background: var(--color-background-secondary); display: flex; justify-content: space-between; align-items: center; }
+  .wk.sprint .wk-h { background: #DCFCE7; color: #14532D; }
+  .wk-ph { font-size: 9px; padding: 2px 7px; border-radius: 6px; font-weight: 500; }
+  .p0 { background: #FEF9C3; color: #713F12; } .p1 { background: #DCFCE7; color: #14532D; }
+  .p2 { background: #DBEAFE; color: #1E3A8A; } .p3 { background: #FDF4FF; color: #581C87; } .p4 { background: #FEE2E2; color: #7F1D1D; }
+  .wk-days { display: grid; grid-template-columns: repeat(7,1fr); }
+  .day { padding: 5px 2px; cursor: pointer; border-right: 0.5px solid var(--color-border-tertiary); text-align: center; transition: opacity .15s; }
+  .day:last-child { border-right: none; }
+  .day:hover { opacity: .8; }
+  .day.sel { outline: 2px solid var(--color-text-primary); outline-offset: -2px; border-radius: 4px; }
+  .day.tod { outline: 2.5px solid #2563EB; outline-offset: -2px; border-radius: 4px; }
+  .dn { font-size: 9px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 1px; }
+  .dd { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+  .db { font-size: 7px; font-weight: 500; padding: 1px 3px; border-radius: 2px; }
+  .dm { font-size: 7px; opacity: .6; }
+  .empty-d { pointer-events: none; background: none; }
+  .c-is { background: #FEF9C3; } .c-is .dd { color: #713F12; }
+  .c-soc { background: #DCFCE7; } .c-soc .dd { color: #14532D; }
+  .c-ar { background: #DBEAFE; } .c-ar .dd { color: #1E3A8A; }
+  .c-fr { background: #FDF4FF; } .c-fr .dd { color: #581C87; }
+  .c-sp { background: #BBFCD0; } .c-sp .dd { color: #065F46; }
+  .c-ex { background: #FEF3C7; } .c-ex .dd { color: #92400E; }
+  .c-mx { background: #F1F5F9; } .c-mx .dd { color: #334155; }
+  .c-rs { background: var(--color-background-secondary); } .c-rs .dd { color: var(--color-text-tertiary); }
+  .c-xm { background: #DC2626; } .c-xm .dd, .c-xm .dn { color: #fff !important; }
+  .b17 { background: #FDE68A; color: #78350F; } .b12 { background: #F59E0B; color: #fff; }
+  .bl { background: #D1FAE5; color: #065F46; } .bs { background: #16A34A; color: #fff; }
+  .bx { background: #991B1B; color: #fff; } .br { background: var(--color-background-secondary); color: var(--color-text-tertiary); }
+
+  /* DETAIL PANEL */
+  .det { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 12px; min-height: 90px; margin-top: 8px; }
+  .det-h { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .det-av { font-size: 10px; background: var(--color-background-secondary); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px; color: var(--color-text-secondary); }
+  .task { display: flex; gap: 7px; padding: 7px 9px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); margin-bottom: 4px; }
+  .t-tm { font-size: 9px; color: var(--color-text-tertiary); min-width: 48px; flex-shrink: 0; margin-top: 2px; }
+  .t-b { flex: 1; }
+  .t-ti { font-size: 11px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+  .t-s { font-size: 10px; color: var(--color-text-secondary); margin-top: 1px; }
+  .sp { font-size: 9px; font-weight: 500; padding: 2px 6px; border-radius: 6px; margin-right: 4px; }
+  .sp-is { background: #FEF9C3; color: #713F12; } .sp-soc { background: #DCFCE7; color: #14532D; }
+  .sp-ar { background: #DBEAFE; color: #1E3A8A; } .sp-fr { background: #FDF4FF; color: #581C87; }
+  .sp-ex { background: #FEF3C7; color: #92400E; }
+  .det-n { font-size: 10px; color: var(--color-text-secondary); background: var(--color-background-secondary); padding: 6px 9px; border-radius: var(--border-radius-md); margin-top: 7px; line-height: 1.6; border-left: 3px solid var(--color-border-info); }
+
+  /* TODO LIST */
+  .todo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 10px 12px; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); }
+  .rst-btn { font-size: 10px; color: var(--color-text-tertiary); cursor: pointer; border: 0.5px solid var(--color-border-tertiary); padding: 3px 9px; border-radius: 12px; background: none; }
+  .rst-btn:hover { color: var(--color-text-secondary); }
+  .grp-title { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 7px; margin-top: 4px; }
+  .ch { display: flex; align-items: flex-start; gap: 9px; padding: 9px 11px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); margin-bottom: 5px; cursor: pointer; transition: border-color .15s; }
+  .ch:hover { border-color: var(--color-border-secondary); }
+  .ch.done { background: var(--color-background-secondary); opacity: .6; }
+  .ch.done .ch-name { text-decoration: line-through; color: var(--color-text-tertiary); }
+  .ck { width: 17px; height: 17px; border-radius: 4px; border: 1.5px solid var(--color-border-secondary); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all .15s; }
+  .ck.on { border-color: transparent; }
+  .ch-name { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; flex: 1; }
+  .ph-pill { font-size: 9px; padding: 2px 6px; border-radius: 8px; flex-shrink: 0; font-weight: 500; margin-top: 2px; }
+  .pp1 { background: #DBEAFE; color: #1E3A8A; } .pp2 { background: #FEF3C7; color: #92400E; } .pp3 { background: #FCE7F3; color: #9D174D; }
+
+  /* GUIDE */
+  .guide-step { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px 14px; margin-bottom: 8px; }
+  .gs-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-text-primary); color: var(--color-background-primary); font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .gs-row { display: flex; gap: 10px; align-items: flex-start; }
+  .gs-body { flex: 1; }
+  .gs-title { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+  .gs-text { font-size: 11px; color: var(--color-text-secondary); line-height: 1.7; }
+  .tip-box { background: var(--color-background-secondary); border-left: 3px solid var(--color-border-info); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 8px 10px; font-size: 11px; color: var(--color-text-secondary); line-height: 1.6; margin-top: 6px; }
+
+  @media (max-width: 600px) {
+    .pb-row { grid-template-columns: 1fr; }
+    .cds { flex-wrap: wrap; }
+    .cd { min-width: calc(50% - 4px); }
+    .topbar h1 { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>📚 Bac 2026</h1>
+    <span class="topbar-user" id="userName"></span>
+  </div>
+  <div class="topbar-right">
+    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+  </div>
+</div>
+
+<div class="w">
+
+<div class="nav">
+  <button class="nt on" data-tab="prog" onclick="show('prog',this)">📊 Progression</button>
+  <button class="nt" data-tab="cal" onclick="show('cal',this)">📅 Calendrier</button>
+  <button class="nt" data-tab="t-is" onclick="show('t-is',this)">✅ IS <span id="nb-is"></span></button>
+  <button class="nt" data-tab="t-soc" onclick="show('t-soc',this)">✅ SOC <span id="nb-soc"></span></button>
+  <button class="nt" data-tab="t-ar" onclick="show('t-ar',this)">✅ AR <span id="nb-ar"></span></button>
+  <button class="nt" data-tab="t-fr" onclick="show('t-fr',this)">✅ FR <span id="nb-fr"></span></button>
+  <button class="nt" data-tab="guide" onclick="show('guide',this)">❓ Guide</button>
+</div>
+
+<!-- ===== PROGRESSION ===== -->
+<div id="prog" class="sec on">
+  <div class="cds">
+    <div class="cd"><div class="cd-n" id="jj">--</div><div class="cd-l">jours restants</div></div>
+    <div class="cd"><div class="cd-n" style="color:#16A34A">7</div><div class="cd-l">jours libres (4-10 mai)</div></div>
+    <div class="cd"><div class="cd-n" id="tot-done">0</div><div class="cd-l">cours cochés</div></div>
+    <div class="cd"><div class="cd-n">73</div><div class="cd-l">cours total</div></div>
+  </div>
+  <div class="total-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:500">Progression globale</span>
+      <span style="font-size:13px;color:var(--color-text-secondary)" id="tot-pct">0%</span>
+    </div>
+    <div class="total-bar"><div class="total-fill" id="tot-bar" style="width:0%"></div></div>
+    <div style="font-size:10px;color:var(--color-text-tertiary)" id="tot-label">0 / 73 cours révisés</div>
+  </div>
+  <div class="pb-row">
+    <div class="pb-card">
+      <div class="pb-top"><span class="pb-name" style="color:#713F12">📖 التربية الإسلامية</span><span class="pb-num" style="color:#713F12" id="pn-is">0</span></div>
+      <div class="pb-bar"><div class="pb-fill" id="pb-is" style="width:0%;background:#F59E0B"></div></div>
+      <div class="pb-label" id="pl-is">0 / 27 cours</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-top"><span class="pb-name" style="color:#14532D">🌍 الاجتماعيات</span><span class="pb-num" style="color:#14532D" id="pn-soc">0</span></div>
+      <div class="pb-bar"><div class="pb-fill" id="pb-soc" style="width:0%;background:#22C55E"></div></div>
+      <div class="pb-label" id="pl-soc">0 / 16 cours</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-top"><span class="pb-name" style="color:#1E3A8A">✍️ اللغة العربية</span><span class="pb-num" style="color:#1E3A8A" id="pn-ar">0</span></div>
+      <div class="pb-bar"><div class="pb-fill" id="pb-ar" style="width:0%;background:#3B82F6"></div></div>
+      <div class="pb-label" id="pl-ar">0 / 15 cours</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-top"><span class="pb-name" style="color:#581C87">🇫🇷 Français</span><span class="pb-num" style="color:#581C87" id="pn-fr">0</span></div>
+      <div class="pb-bar"><div class="pb-fill" id="pb-fr" style="width:0%;background:#A855F7"></div></div>
+      <div class="pb-label" id="pl-fr">0 / 15 cours</div>
+    </div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:12px;font-size:11px;color:var(--color-text-secondary);line-height:1.7">
+    <strong style="color:var(--color-text-primary)">Rappel des phases :</strong><br>
+    Phase 1 (18 avr→3 mai) : coche tous les cours après révision → <strong>73 ✓</strong><br>
+    Sprint (4→10 mai) : examens blancs + annales → voir le calendrier<br>
+    Phase 2 (11→22 mai) : exercices ciblés sur les erreurs<br>
+    Phase 3 (23→31 mai) : révision légère + repos → 🎯 1er juin
+  </div>
+</div>
+
+<!-- ===== CALENDRIER ===== -->
+<div id="cal" class="sec">
+  <div id="wc"></div>
+  <div class="det" id="det"><div style="text-align:center;color:var(--color-text-tertiary);padding:1.5rem 0;font-size:12px">Clique sur un jour pour voir le plan détaillé</div></div>
+</div>
+
+<!-- ===== TODO IS ===== -->
+<div id="t-is" class="sec">
+  <div class="todo-header c-is">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:#713F12">📖 التربية الإسلامية</div>
+      <div style="font-size:11px;color:#92400E;margin-top:2px" id="is-prog">0 / 27 cours cochés</div>
+      <div style="height:5px;width:180px;background:#FDE68A;border-radius:3px;margin-top:4px;overflow:hidden"><div class="pb-fill" id="is-bar" style="width:0%;background:#D97706"></div></div>
+    </div>
+    <button class="rst-btn" onclick="resetSubj('is')">Réinitialiser</button>
+  </div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل التزكية — العقيدة</div>
+  <div class="ch" onclick="tog('is','is01')"><div class="ck" id="ck-is01"></div><div class="ch-name" id="nm-is01">الإيمان والغيب</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is02')"><div class="ck" id="ck-is02"></div><div class="ch-name" id="nm-is02">الإيمان والعلم</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is03')"><div class="ck" id="ck-is03"></div><div class="ch-name" id="nm-is03">الإيمان والفلسفة</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is04')"><div class="ck" id="ck-is04"></div><div class="ch-name" id="nm-is04">الإيمان وعمارة الأرض</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل الاقتداء</div>
+  <div class="ch" onclick="tog('is','is05')"><div class="ck" id="ck-is05"></div><div class="ch-name" id="nm-is05">صلح الحديبية وفتح مكة — دروس وعبر</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is06')"><div class="ck" id="ck-is06"></div><div class="ch-name" id="nm-is06">الرسول ﷺ مفاوضاً ومستشاراً</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is07')"><div class="ck" id="ck-is07"></div><div class="ch-name" id="nm-is07">نماذج للتأسي : عثمان بن عفان — قوة الليل والحياء</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is08')"><div class="ck" id="ck-is08"></div><div class="ch-name" id="nm-is08">الرسول ﷺ في بيته</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل الاستجابة</div>
+  <div class="ch" onclick="tog('is','is09')"><div class="ck" id="ck-is09"></div><div class="ch-name" id="nm-is09">فقه الأسرة — الزواج : الأحكام والمقاصد</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is10')"><div class="ck" id="ck-is10"></div><div class="ch-name" id="nm-is10">فقه الأسرة — الطلاق : الأحكام والمقاصد</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is11')"><div class="ck" id="ck-is11"></div><div class="ch-name" id="nm-is11">رعاية الأطفال وحقوقهم</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is12')"><div class="ck" id="ck-is12"></div><div class="ch-name" id="nm-is12">فقه الأسرة — نواة المجتمع</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل الفضيلة</div>
+  <div class="ch" onclick="tog('is','is13')"><div class="ck" id="ck-is13"></div><div class="ch-name" id="nm-is13">حق الله : الوفاء بالنعمة والمسؤولية</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is14')"><div class="ck" id="ck-is14"></div><div class="ch-name" id="nm-is14">حق النفس : الصبر واليقين</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is15')"><div class="ck" id="ck-is15"></div><div class="ch-name" id="nm-is15">حق الغير : العفة والحياء</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is16')"><div class="ck" id="ck-is16"></div><div class="ch-name" id="nm-is16">حق البيئة : التوسط والاعتدال</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل الحكمة</div>
+  <div class="ch" onclick="tog('is','is17')"><div class="ck" id="ck-is17"></div><div class="ch-name" id="nm-is17">العفو والتسامح</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is18')"><div class="ck" id="ck-is18"></div><div class="ch-name" id="nm-is18">الكفاءة والاستحقاق أساس التكليف</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is19')"><div class="ck" id="ck-is19"></div><div class="ch-name" id="nm-is19">وقاية المجتمع من تفشي الفواحش</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is20')"><div class="ck" id="ck-is20"></div><div class="ch-name" id="nm-is20">السبعة الذين يظلهم الله</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#FEF9C3;color:#713F12">منهل التزكية — القرآن الكريم (سورة يوسف)</div>
+  <div class="ch" onclick="tog('is','is21')"><div class="ck" id="ck-is21"></div><div class="ch-name" id="nm-is21">ورتلة تعريفية بسورة يوسف</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is22')"><div class="ck" id="ck-is22"></div><div class="ch-name" id="nm-is22">المقطع الأول — الآية 1 إلى 20</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is23')"><div class="ck" id="ck-is23"></div><div class="ch-name" id="nm-is23">المقطع الثاني — الآية 21 إلى 34</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('is','is24')"><div class="ck" id="ck-is24"></div><div class="ch-name" id="nm-is24">المقطع الثالث — الآية 35 إلى 53</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('is','is25')"><div class="ck" id="ck-is25"></div><div class="ch-name" id="nm-is25">المقطع الرابع — الآية 54 إلى 68</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('is','is26')"><div class="ck" id="ck-is26"></div><div class="ch-name" id="nm-is26">المقطع الخامس — الآية 69 إلى 87</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('is','is27')"><div class="ck" id="ck-is27"></div><div class="ch-name" id="nm-is27">المقطع السادس — الآية 88 إلى 111</div><div class="ph-pill pp2">P2</div></div>
+</div>
+
+<!-- ===== TODO SOC ===== -->
+<div id="t-soc" class="sec">
+  <div class="todo-header c-soc">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:#14532D">🌍 الاجتماعيات</div>
+      <div style="font-size:11px;color:#166534;margin-top:2px" id="soc-prog">0 / 16 cours cochés</div>
+      <div style="height:5px;width:180px;background:#A7F3D0;border-radius:3px;margin-top:4px;overflow:hidden"><div class="pb-fill" id="soc-bar" style="width:0%;background:#16A34A"></div></div>
+    </div>
+    <button class="rst-btn" onclick="resetSubj('soc')">Réinitialiser</button>
+  </div>
+
+  <div class="grp-title" style="background:#DCFCE7;color:#14532D">التاريخ</div>
+  <div class="ch" onclick="tog('soc','soc01')"><div class="ck" id="ck-soc01"></div><div class="ch-name" id="nm-soc01">التحولات الاقتصادية والمالية والفكرية بالعالم الرأسمالي خلال القرن 19</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc02')"><div class="ck" id="ck-soc02"></div><div class="ch-name" id="nm-soc02">التنافس الامبريالي واندلاع الحرب العالمية الأولى</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc03')"><div class="ck" id="ck-soc03"></div><div class="ch-name" id="nm-soc03">اليقظة الفكرية بالمشرق العربي</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc04')"><div class="ck" id="ck-soc04"></div><div class="ch-name" id="nm-soc04">الضغوط الاستعمارية على المغرب ومحاولات الإصلاح</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc05')"><div class="ck" id="ck-soc05"></div><div class="ch-name" id="nm-soc05">أوروبا من نهاية الحرب العالمية الأولى إلى أزمة 1929م</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc06')"><div class="ck" id="ck-soc06"></div><div class="ch-name" id="nm-soc06">الحرب العالمية الثانية — الأسباب والنتائج</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc07')"><div class="ck" id="ck-soc07"></div><div class="ch-name" id="nm-soc07">نظام الحماية بالمغرب والاستقلال الاستعماري</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc08')"><div class="ck" id="ck-soc08"></div><div class="ch-name" id="nm-soc08">نضال المغرب للاستقلال واستكمال الوحدة الترابية</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#DCFCE7;color:#14532D">الجغرافيا</div>
+  <div class="ch" onclick="tog('soc','soc09')"><div class="ck" id="ck-soc09"></div><div class="ch-name" id="nm-soc09">مفهوم التنمية — التقسيمات الكبرى وخريطة التنمية</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc10')"><div class="ck" id="ck-soc10"></div><div class="ch-name" id="nm-soc10">المجال المغربي — الموارد الطبيعية والبشرية</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc11')"><div class="ck" id="ck-soc11"></div><div class="ch-name" id="nm-soc11">الاختيارات الكبرى لسياسة إعداد التراب الوطني</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc12')"><div class="ck" id="ck-soc12"></div><div class="ch-name" id="nm-soc12">التهيئة الحضرية والريفية — أزمة المدينة وأشكال التدخل</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('soc','soc13')"><div class="ck" id="ck-soc13"></div><div class="ch-name" id="nm-soc13">العالم العربي — مشكل الماء وظاهرة التصحر</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('soc','soc14')"><div class="ck" id="ck-soc14"></div><div class="ch-name" id="nm-soc14">الولايات المتحدة الأمريكية : قوة اقتصادية عظمى</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('soc','soc15')"><div class="ck" id="ck-soc15"></div><div class="ch-name" id="nm-soc15">الاتحاد الأوروبي</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('soc','soc16')"><div class="ck" id="ck-soc16"></div><div class="ch-name" id="nm-soc16">الصين : قوة اقتصادية صاعدة</div><div class="ph-pill pp2">P2</div></div>
+</div>
+
+<!-- ===== TODO AR ===== -->
+<div id="t-ar" class="sec">
+  <div class="todo-header c-ar">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:#1E3A8A">✍️ اللغة العربية</div>
+      <div style="font-size:11px;color:#1E40AF;margin-top:2px" id="ar-prog">0 / 15 cours cochés</div>
+      <div style="height:5px;width:180px;background:#BFDBFE;border-radius:3px;margin-top:4px;overflow:hidden"><div class="pb-fill" id="ar-bar" style="width:0%;background:#3B82F6"></div></div>
+    </div>
+    <button class="rst-btn" onclick="resetSubj('ar')">Réinitialiser</button>
+  </div>
+
+  <div class="grp-title" style="background:#DBEAFE;color:#1E3A8A">الدروس اللغوية</div>
+  <div class="ch" onclick="tog('ar','ar01')"><div class="ck" id="ck-ar01"></div><div class="ch-name" id="nm-ar01">التمييز</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar02')"><div class="ck" id="ck-ar02"></div><div class="ch-name" id="nm-ar02">العدد</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar03')"><div class="ck" id="ck-ar03"></div><div class="ch-name" id="nm-ar03">الاستفهام</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar04')"><div class="ck" id="ck-ar04"></div><div class="ch-name" id="nm-ar04">الأمر والنهي</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar05')"><div class="ck" id="ck-ar05"></div><div class="ch-name" id="nm-ar05">أسلوب التمني</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar06')"><div class="ck" id="ck-ar06"></div><div class="ch-name" id="nm-ar06">المصادر</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar07')"><div class="ck" id="ck-ar07"></div><div class="ch-name" id="nm-ar07">النسبة</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar08')"><div class="ck" id="ck-ar08"></div><div class="ch-name" id="nm-ar08">الطباق والمقابلة</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar09')"><div class="ck" id="ck-ar09"></div><div class="ch-name" id="nm-ar09">الاستعارة</div><div class="ph-pill pp1">P1</div></div>
+
+  <div class="grp-title" style="background:#DBEAFE;color:#1E3A8A">دروس النصوص</div>
+  <div class="ch" onclick="tog('ar','ar10')"><div class="ck" id="ck-ar10"></div><div class="ch-name" id="nm-ar10">أنواع الخطاب</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('ar','ar11')"><div class="ck" id="ck-ar11"></div><div class="ch-name" id="nm-ar11">مكون النصوص — قضايا معاصرة</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('ar','ar12')"><div class="ck" id="ck-ar12"></div><div class="ch-name" id="nm-ar12">مكون النصوص — مفاهيم</div><div class="ph-pill pp2">P2</div></div>
+
+  <div class="grp-title" style="background:#DBEAFE;color:#1E3A8A">دروس التعبير</div>
+  <div class="ch" onclick="tog('ar','ar13')"><div class="ck" id="ck-ar13"></div><div class="ch-name" id="nm-ar13">مهارة تحليل الصورة</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('ar','ar14')"><div class="ck" id="ck-ar14"></div><div class="ch-name" id="nm-ar14">مهارة الربط بين الأفكار</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('ar','ar15')"><div class="ck" id="ck-ar15"></div><div class="ch-name" id="nm-ar15">مهارة توسيع فكرة</div><div class="ph-pill pp2">P2</div></div>
+</div>
+
+<!-- ===== TODO FR ===== -->
+<div id="t-fr" class="sec">
+  <div class="todo-header c-fr">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:#581C87">🇫🇷 Français</div>
+      <div style="font-size:11px;color:#6B21A8;margin-top:2px" id="fr-prog">0 / 15 cours cochés</div>
+      <div style="height:5px;width:180px;background:#E9D5FF;border-radius:3px;margin-top:4px;overflow:hidden"><div class="pb-fill" id="fr-bar" style="width:0%;background:#A855F7"></div></div>
+    </div>
+    <button class="rst-btn" onclick="resetSubj('fr')">Réinitialiser</button>
+  </div>
+
+  <div class="grp-title" style="background:#FDF4FF;color:#581C87">Linguistiques</div>
+  <div class="ch" onclick="tog('fr','fr01')"><div class="ck" id="ck-fr01"></div><div class="ch-name" id="nm-fr01">Les registres de langues</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr02')"><div class="ck" id="ck-fr02"></div><div class="ch-name" id="nm-fr02">Les champs lexicaux</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr03')"><div class="ck" id="ck-fr03"></div><div class="ch-name" id="nm-fr03">L'énonciation</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr04')"><div class="ck" id="ck-fr04"></div><div class="ch-name" id="nm-fr04">La typologie des textes</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr05')"><div class="ck" id="ck-fr05"></div><div class="ch-name" id="nm-fr05">Le discours rapporté</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr06')"><div class="ck" id="ck-fr06"></div><div class="ch-name" id="nm-fr06">Les registres littéraires</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr07')"><div class="ck" id="ck-fr07"></div><div class="ch-name" id="nm-fr07">Les figures de style</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr08')"><div class="ck" id="ck-fr08"></div><div class="ch-name" id="nm-fr08">Les genres littéraires</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr09')"><div class="ck" id="ck-fr09"></div><div class="ch-name" id="nm-fr09">Les narrateurs et les focalisations</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('fr','fr10')"><div class="ck" id="ck-fr10"></div><div class="ch-name" id="nm-fr10">Les règles de l'accord</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr11')"><div class="ck" id="ck-fr11"></div><div class="ch-name" id="nm-fr11">Les valeurs des modes et temps verbaux</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr12')"><div class="ck" id="ck-fr12"></div><div class="ch-name" id="nm-fr12">La phrase simple et la phrase complexe</div><div class="ph-pill pp2">P2</div></div>
+
+  <div class="grp-title" style="background:#FDF4FF;color:#581C87">Romans — œuvres au programme</div>
+  <div class="ch" onclick="tog('fr','fr13')"><div class="ck" id="ck-fr13"></div><div class="ch-name" id="nm-fr13">La boîte à merveilles — Ahmed Sefrioui</div><div class="ph-pill pp1">P1</div></div>
+  <div class="ch" onclick="tog('fr','fr14')"><div class="ck" id="ck-fr14"></div><div class="ch-name" id="nm-fr14">Antigone — Jean Anouilh</div><div class="ph-pill pp2">P2</div></div>
+  <div class="ch" onclick="tog('fr','fr15')"><div class="ck" id="ck-fr15"></div><div class="ch-name" id="nm-fr15">Le dernier jour d'un condamné — Victor Hugo</div><div class="ph-pill pp2">P2</div></div>
+</div>
+
+<!-- ===== GUIDE ===== -->
+<div id="guide" class="sec">
+  <div class="guide-step">
+    <div class="gs-row"><div class="gs-num">1</div><div class="gs-body">
+      <div class="gs-title">Cocher un cours (todo list)</div>
+      <div class="gs-text">Va dans un onglet de matière (IS / SOC / AR / FR). Clique ou touche n'importe quelle ligne de cours — elle se barre automatiquement et la progression se met à jour.</div>
+      <div class="tip-box">✅ Coche un cours APRÈS l'avoir révisé et fait la fiche — pas avant !</div>
+    </div></div>
+  </div>
+
+  <div class="guide-step">
+    <div class="gs-row"><div class="gs-num">2</div><div class="gs-body">
+      <div class="gs-title">Consulter le calendrier</div>
+      <div class="gs-text">Clique sur l'onglet 📅 Calendrier. Chaque case colorée = 1 jour. Clique un jour pour voir exactement quoi étudier, à quelle heure.</div>
+      <div class="tip-box">📅 Consulte le calendrier chaque matin pour savoir ton programme du jour.</div>
+    </div></div>
+  </div>
+
+  <div class="guide-step">
+    <div class="gs-row"><div class="gs-num">3</div><div class="gs-body">
+      <div class="gs-title">Sauvegarde automatique</div>
+      <div class="gs-text">Tes coches sont sauvegardées sur le serveur, liées à ton nom. Tu peux te reconnecter depuis n'importe quel appareil avec le même nom pour retrouver ta progression.</div>
+      <div class="tip-box">💡 Utilise toujours le même nom/pseudo pour garder ta progression.</div>
+    </div></div>
+  </div>
+
+  <div class="guide-step">
+    <div class="gs-row"><div class="gs-num">4</div><div class="gs-body">
+      <div class="gs-title">Utilisation quotidienne recommandée</div>
+      <div class="gs-text">Le matin → ouvre le calendrier → lis ce que tu dois faire aujourd'hui. Après chaque cours révisé → coche-le dans la todo list. Le soir → vérifie ta progression dans l'onglet 📊.</div>
+    </div></div>
+  </div>
+
+  <div class="guide-step">
+    <div class="gs-row"><div class="gs-num">5</div><div class="gs-body">
+      <div class="gs-title">Réinitialiser une matière</div>
+      <div class="gs-text">Dans chaque onglet matière, il y a un bouton "Réinitialiser" en haut à droite. Il efface toutes les coches de cette matière.</div>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const EXAM_DATE = new Date('2026-06-01');
+const TOTALS = { is: 27, soc: 16, ar: 15, fr: 15 };
+let ST = {};
+
+// --- API helpers ---
+async function apiGet(url) {
+  const res = await fetch(url);
+  if (res.status === 401) { window.location.href = '/'; return null; }
+  return res.json();
+}
+async function apiPost(url, body) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (res.status === 401) { window.location.href = '/'; return null; }
+  return res.json();
+}
+
+// --- Init ---
+async function init() {
+  const me = await apiGet('/api/me');
+  if (!me || !me.loggedIn) { window.location.href = '/'; return; }
+  document.getElementById('userName').textContent = '— ' + me.name;
+
+  // Load todos from server
+  const todos = await apiGet('/api/todos');
+  if (todos) ST = todos;
+
+  // Countdown
+  const now = new Date();
+  const diff = Math.ceil((EXAM_DATE - now) / (1000 * 60 * 60 * 24));
+  document.getElementById('jj').textContent = Math.max(0, diff);
+
+  // Render all items
+  Object.keys(TOTALS).forEach(subj => {
+    for (let i = 1; i <= TOTALS[subj]; i++) {
+      const k = subj + (i < 10 ? '0' + i : i);
+      renderItem(k, !!ST[k]);
+    }
+    updateSubj(subj);
+  });
+  updateTotal();
+  buildCal();
+
+  // Select today in calendar
+  const todayStr = now.toISOString().split('T')[0];
+  selDay(todayStr);
+}
+
+function show(id, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(t => t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+async function tog(subj, id) {
+  ST[id] = !ST[id];
+  renderItem(id, ST[id]);
+  updateSubj(subj);
+  updateTotal();
+  await apiPost('/api/todos/toggle', { key: id, done: ST[id] });
+}
+
+function renderItem(id, done) {
+  const ck = document.getElementById('ck-' + id);
+  const item = ck ? ck.closest('.ch') : null;
+  if (!ck) return;
+  if (done) {
+    ck.innerHTML = '✓'; ck.classList.add('on');
+    ck.style.background = '#22C55E'; ck.style.color = '#fff'; ck.style.borderColor = 'transparent';
+    item && item.classList.add('done');
+  } else {
+    ck.innerHTML = ''; ck.classList.remove('on');
+    ck.style.background = ''; ck.style.color = ''; ck.style.borderColor = '';
+    item && item.classList.remove('done');
+  }
+}
+
+function countDone(subj) {
+  let n = 0;
+  for (let i = 1; i <= TOTALS[subj]; i++) {
+    const k = subj + (i < 10 ? '0' + i : i);
+    if (ST[k]) n++;
+  }
+  return n;
+}
+
+function updateSubj(subj) {
+  const done = countDone(subj);
+  const tot = TOTALS[subj];
+  const pct = Math.round(done / tot * 100);
+  const nb = document.getElementById('nb-' + subj);
+  if (nb) nb.textContent = done > 0 ? `(${done})` : '';
+  const pg = document.getElementById(subj + '-prog');
+  if (pg) pg.textContent = done + ' / ' + tot + ' cours cochés';
+  const bar = document.getElementById(subj + '-bar');
+  if (bar) bar.style.width = pct + '%';
+  const pn = document.getElementById('pn-' + subj);
+  if (pn) pn.textContent = done;
+  const pb = document.getElementById('pb-' + subj);
+  if (pb) pb.style.width = pct + '%';
+  const pl = document.getElementById('pl-' + subj);
+  if (pl) pl.textContent = done + ' / ' + tot + ' cours';
+}
+
+function updateTotal() {
+  let tot = 0, done = 0;
+  Object.keys(TOTALS).forEach(s => { tot += TOTALS[s]; done += countDone(s); });
+  const pct = Math.round(done / tot * 100);
+  const el = document.getElementById('tot-bar'); if (el) el.style.width = pct + '%';
+  const tp = document.getElementById('tot-pct'); if (tp) tp.textContent = pct + '%';
+  const tl = document.getElementById('tot-label'); if (tl) tl.textContent = done + ' / ' + tot + ' cours révisés';
+  const td = document.getElementById('tot-done'); if (td) td.textContent = done;
+}
+
+async function resetSubj(subj) {
+  if (!confirm('Réinitialiser tous les cours de cette matière ?')) return;
+  for (let i = 1; i <= TOTALS[subj]; i++) {
+    const k = subj + (i < 10 ? '0' + i : i);
+    ST[k] = false;
+    renderItem(k, false);
+  }
+  updateSubj(subj);
+  updateTotal();
+  await apiPost('/api/todos/reset', { subj });
+}
+
+async function logout() {
+  await apiPost('/api/logout', {});
+  window.location.href = '/';
+}
+
+// ===== CALENDAR DATA =====
+const P={
+  '2026-04-18':{c:'c-is',b:'bl',h:'Samedi 18 avr — J-44',av:'Toute la journée',t:[{tm:'9h–13h',s:'sp-is',ti:'IS — العقيدة (4 cours)',d:'الإيمان والغيب / والعلم / والفلسفة / وعمارة الأرض'},{tm:'14h–18h',s:'sp-is',ti:'IS — الاقتداء (4 cours)',d:'صلح الحديبية / الرسول مفاوضاً / عثمان / الرسول في بيته'},{tm:'18h30–20h',s:'sp-is',ti:'Quiz oral — 8 fiches du jour',d:''}],n:'J1 — 8/27 IS après aujourd\'hui.'},
+  '2026-04-19':{c:'c-is',b:'bl',h:'Dimanche 19 avr — J-43',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-is',ti:'IS — الاستجابة (4 cours)',d:'الزواج / الطلاق / رعاية الأطفال / نواة المجتمع'},{tm:'13h–16h',s:'sp-is',ti:'IS — الفضيلة (4 cours)',d:'حق الله / النفس / الغير / البيئة'},{tm:'16h30–19h',s:'sp-is',ti:'Révision des 16 fiches IS',d:''}],n:'16/27 IS vus après ce week-end !'},
+  '2026-04-20':{c:'c-is',b:'b17',h:'Lundi 20 avr — J-42',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-is',ti:'IS — الحكمة (4 cours)',d:'العفو / الكفاءة / وقاية المجتمع / السبعة'},{tm:'19h15–21h',s:'sp-is',ti:'IS — القرآن : ورتلة + مقطع 1',d:'الآية 1–20'}],n:'22/27 IS vus.'},
+  '2026-04-21':{c:'c-is',b:'b17',h:'Mardi 21 avr — J-41',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-is',ti:'IS — القرآن مقطع 2 + 3',d:'الآية 21–53'},{tm:'19h–21h',s:'sp-is',ti:'IS — القرآن مقطع 4 + 5',d:'الآية 54–87'}],n:'26/27 IS vus.'},
+  '2026-04-22':{c:'c-is',b:'b12',h:'Mercredi 22 avr — J-40',av:'Dispo dès 12h (8h)',t:[{tm:'12h–13h',s:'sp-is',ti:'IS — القرآن مقطع 6 ✓ IS TERMINÉ',d:'الآية 88–111 — 27/27 cours'},{tm:'13h30–15h',s:'sp-is',ti:'BILAN IS — révision toutes les fiches',d:''},{tm:'15h30–20h',s:'sp-soc',ti:'SOC Histoire — 5 premiers cours',d:'التحولات ق19 / الامبريالية / اليقظة / الضغوط / أوروبا 1929'}],n:'IS TERMINÉ ! SOC démarre.'},
+  '2026-04-23':{c:'c-soc',b:'b17',h:'Jeudi 23 avr — J-39',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-soc',ti:'SOC Histoire cours 6 + 7',d:'الحرب العالمية الثانية / نظام الحماية بالمغرب'},{tm:'19h15–21h',s:'sp-soc',ti:'SOC Histoire cours 8 ✓',d:'نضال المغرب للاستقلال — Histoire TERMINÉE'}],n:'Histoire 8/8 ✓'},
+  '2026-04-24':{c:'c-soc',b:'b12',h:'Vendredi 24 avr — J-38',av:'Dispo dès 12h (8h)',t:[{tm:'12h–15h',s:'sp-soc',ti:'SOC Géo 4 premiers cours',d:'التنمية / الموارد / الاختيارات الكبرى / التهيئة'},{tm:'15h30–18h',s:'sp-soc',ti:'SOC Géo 4 derniers cours ✓ SOC TERMINÉ',d:'العالم العربي / USA / UE / الصين — 16/16'},{tm:'18h30–20h',s:'sp-soc',ti:'BILAN SOC complet',d:''}],n:'SOC TERMINÉ en 3 jours !'},
+  '2026-04-25':{c:'c-ar',b:'bl',h:'Samedi 25 avr — J-37',av:'Toute la journée',t:[{tm:'9h–13h',s:'sp-ar',ti:'AR — لغوية : 7 cours',d:'التمييز / العدد / الاستفهام / الأمر والنهي / التمني / المصادر / النسبة'},{tm:'14h–17h',s:'sp-ar',ti:'AR — لغوية fin + نصوص',d:'الطباق / الاستعارة + أنواع الخطاب / القضايا'},{tm:'17h30–19h30',s:'sp-ar',ti:'AR — نصوص fin + تعبير ✓ AR TERMINÉ',d:'مكون مفاهيم + تحليل الصورة / الربط / توسيع فكرة'}],n:'AR TERMINÉ ! 15/15 en 1 journée.'},
+  '2026-04-26':{c:'c-fr',b:'bl',h:'Dimanche 26 avr — J-36',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-fr',ti:'FR Linguistiques — 6 cours',d:'Registres langues / Champs lexicaux / Énonciation / Typologies / Disc. rapporté / Registres litt.'},{tm:'13h–16h',s:'sp-fr',ti:'FR Linguistiques — 6 cours',d:'Figures de style / Genres / Narrateurs / Accord / Temps verbaux / Phrase'},{tm:'16h30–19h',s:'sp-fr',ti:'FR Romans — 3 œuvres ✓ FR TERMINÉ',d:'La boîte / Antigone / Dernier jour — résumés + thèmes + citations'}],n:'4 MATIÈRES TERMINÉES en 9 jours !'},
+  '2026-04-27':{c:'c-mx',b:'b17',h:'Lundi 27 avr — J-35',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-is',ti:'IS — Révision fiches manhals',d:''},{tm:'19h15–21h',s:'sp-is',ti:'IS — القرآن mémorisation passages clés',d:''}],n:'Consolidation.'},
+  '2026-04-28':{c:'c-mx',b:'b17',h:'Mardi 28 avr — J-34',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-soc',ti:'SOC — Chronologie histoire',d:''},{tm:'19h15–21h',s:'sp-soc',ti:'SOC — Données géo clés',d:''}],n:''},
+  '2026-04-29':{c:'c-mx',b:'b12',h:'Mercredi 29 avr — J-33',av:'Dispo dès 12h (8h)',t:[{tm:'12h–14h',s:'sp-ar',ti:'AR — Exercices الأساليب البيانية',d:''},{tm:'14h30–16h30',s:'sp-fr',ti:'FR — 2 productions écrites',d:''},{tm:'17h–19h',s:'sp-ex',ti:'Mini-test oral 4 matières',d:'Identifier les lacunes avant le sprint'}],n:''},
+  '2026-04-30':{c:'c-mx',b:'b17',h:'Jeudi 30 avr — J-32',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Révision mixte + exercices',d:'IS + AR'}],n:''},
+  '2026-05-01':{c:'c-mx',b:'bl',h:'Vendredi 1er mai — J-31 (Fête Travail)',av:'Journée libre',t:[{tm:'9h–17h',s:'sp-ex',ti:'Révision complète toutes fiches',d:'1h par matière + préparation du sprint 4-10 mai'}],n:'Le sprint commence dans 3 jours !'},
+  '2026-05-02':{c:'c-mx',b:'bl',h:'Samedi 2 mai — J-30',av:'Toute la journée',t:[{tm:'9h–18h',s:'sp-ex',ti:'Exercices IS + SOC + AR + FR',d:'Première série d\'exercices par matière'}],n:''},
+  '2026-05-03':{c:'c-mx',b:'bl',h:'Dimanche 3 mai — J-29',av:'Toute la journée',t:[{tm:'9h–18h',s:'sp-ex',ti:'Révision globale + préparation sprint',d:'Relire toutes les fiches'}],n:'Dernier jour avant le sprint !'},
+  '2026-05-04':{c:'c-sp',b:'bs',h:'Lundi 4 mai — J-28 SPRINT J1',av:'Toute la journée (pas de cours !)',t:[{tm:'9h–12h',s:'sp-is',ti:'EXAMEN BLANC IS complet (2h)',d:'Conditions réelles — chronomètre'},{tm:'13h–14h',s:'sp-is',ti:'Correction IS',d:''},{tm:'15h–18h',s:'sp-soc',ti:'EXAMEN BLANC SOC complet (2h)',d:''},{tm:'18h30–20h',s:'sp-soc',ti:'Correction SOC',d:''}],n:'SPRINT J1 — 2 examens blancs en 1 journée.'},
+  '2026-05-05':{c:'c-sp',b:'bs',h:'Mardi 5 mai — J-27 SPRINT J2',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-ar',ti:'EXAMEN BLANC AR complet (2h)',d:''},{tm:'13h–14h',s:'sp-ar',ti:'Correction AR',d:''},{tm:'15h–17h30',s:'sp-fr',ti:'EXAMEN BLANC FR complet (2h)',d:''},{tm:'18h–20h',s:'sp-fr',ti:'Correction FR',d:''}],n:'SPRINT J2 — 4 examens blancs en 2 jours !'},
+  '2026-05-06':{c:'c-sp',b:'bs',h:'Mercredi 6 mai — J-26 SPRINT J3',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-is',ti:'IS — Révision ciblée points faibles',d:''},{tm:'13h–15h',s:'sp-soc',ti:'SOC — Révision ciblée',d:''},{tm:'15h30–17h30',s:'sp-ar',ti:'AR — Exercices intensifs',d:''},{tm:'18h–20h',s:'sp-fr',ti:'FR — Production écrite',d:''}],n:'SPRINT J3 — correction erreurs.'},
+  '2026-05-07':{c:'c-sp',b:'bs',h:'Jeudi 7 mai — J-25 SPRINT J4',av:'Toute la journée',t:[{tm:'9h–11h',s:'sp-is',ti:'Annale régionale IS',d:'Sujet complet conditions réelles'},{tm:'12h–14h',s:'sp-soc',ti:'Annale régionale SOC',d:''},{tm:'15h–17h',s:'sp-ar',ti:'Annale régionale AR',d:''},{tm:'18h–20h',s:'sp-fr',ti:'Annale régionale FR',d:''}],n:'SPRINT J4 — 4 vraies annales régionales !'},
+  '2026-05-08':{c:'c-sp',b:'bs',h:'Vendredi 8 mai — J-24 SPRINT J5',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-ex',ti:'Correction des 4 annales',d:'Notes sur 20 — identifier lacunes'},{tm:'13h–16h',s:'sp-is',ti:'IS — Mémorisation القرآن passages essentiels',d:''},{tm:'16h30–19h',s:'sp-soc',ti:'SOC — Cartes + données géo',d:''}],n:'SPRINT J5 — correction annales.'},
+  '2026-05-09':{c:'c-sp',b:'bs',h:'Samedi 9 mai — J-23 SPRINT J6',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-ar',ti:'AR — Exercices التعبير intensifs',d:'توسيع فكرة / تحليل الصورة / ربط أفكار'},{tm:'13h–16h',s:'sp-fr',ti:'FR — Romans + production écrite',d:''},{tm:'16h30–18h30',s:'sp-ex',ti:'Fiches ultra-condensées IS + SOC',d:'1 page par matière'}],n:'SPRINT J6 — premières fiches ultra.'},
+  '2026-05-10':{c:'c-sp',b:'bs',h:'Dimanche 10 mai — J-22 SPRINT J7 (FINAL)',av:'Toute la journée',t:[{tm:'9h–11h',s:'sp-ex',ti:'Fiches ultra-condensées AR + FR',d:''},{tm:'12h–16h',s:'sp-ex',ti:'EXAMEN BLANC FINAL du sprint — toutes matières',d:'IS + SOC + AR + FR en conditions réelles'},{tm:'16h30–18h30',s:'sp-ex',ti:'Correction + BILAN du sprint',d:'Note finale par matière'}],n:'SPRINT J7 — BILAN. 8 examens blancs + 4 annales en 7 jours !'},
+  '2026-05-11':{c:'c-mx',b:'b17',h:'Lundi 11 mai — J-21',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-is',ti:'IS — Révision ciblée erreurs sprint',d:''},{tm:'19h15–21h',s:'sp-soc',ti:'SOC — Révision ciblée',d:''}],n:'J-21 — Phase d\'entretien.'},
+  '2026-05-12':{c:'c-mx',b:'b17',h:'Mardi 12 mai — J-20',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-ar',ti:'AR — Exercices rédaction',d:''},{tm:'19h15–21h',s:'sp-fr',ti:'FR — Production écrite',d:''}],n:''},
+  '2026-05-13':{c:'c-mx',b:'b12',h:'Mercredi 13 mai — J-19',av:'Dispo dès 12h',t:[{tm:'12h–16h',s:'sp-ex',ti:'IS + SOC — révision fiches + exercices',d:''},{tm:'17h–20h',s:'sp-ar',ti:'AR — Annale supplémentaire',d:''}],n:''},
+  '2026-05-14':{c:'c-mx',b:'b17',h:'Jeudi 14 mai — J-18',av:'Dispo 17h–21h',t:[{tm:'17h–19h',s:'sp-soc',ti:'SOC — Chronologie + cartes',d:''},{tm:'19h15–21h',s:'sp-is',ti:'IS — القرآن mémorisation',d:''}],n:''},
+  '2026-05-15':{c:'c-mx',b:'b12',h:'Vendredi 15 mai — J-17',av:'Dispo dès 12h',t:[{tm:'12h–16h',s:'sp-fr',ti:'FR — Romans approfondis + exercices',d:''},{tm:'17h–20h',s:'sp-ar',ti:'AR — Révision الأساليب',d:''}],n:'J-17. Le sprint a tout changé.'},
+  '2026-05-16':{c:'c-ex',b:'bl',h:'Samedi 16 mai — J-16',av:'Toute la journée',t:[{tm:'9h–13h',s:'sp-is',ti:'EXAMEN BLANC IS + correction',d:''},{tm:'14h–18h',s:'sp-soc',ti:'EXAMEN BLANC SOC + correction',d:''}],n:'Nouvelle série d\'examens blancs.'},
+  '2026-05-17':{c:'c-ex',b:'bl',h:'Dimanche 17 mai — J-15',av:'Toute la journée',t:[{tm:'9h–13h',s:'sp-ar',ti:'EXAMEN BLANC AR + correction',d:''},{tm:'14h–18h',s:'sp-fr',ti:'EXAMEN BLANC FR + correction',d:''}],n:'J-15 — 2 semaines pile.'},
+  '2026-05-18':{c:'c-mx',b:'b17',h:'Lundi 18 mai — J-14',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Révision ciblée erreurs blancs',d:'IS + SOC'}],n:''},
+  '2026-05-19':{c:'c-mx',b:'b17',h:'Mardi 19 mai — J-13',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Révision ciblée erreurs blancs',d:'AR + FR'}],n:''},
+  '2026-05-20':{c:'c-mx',b:'b12',h:'Mercredi 20 mai — J-12',av:'Dispo dès 12h',t:[{tm:'12h–20h',s:'sp-ex',ti:'Fiches ultra-condensées mises à jour — 4 matières',d:'1 recto A4 par matière avec les points essentiels'}],n:'J-12 — finalise tes fiches ultra.'},
+  '2026-05-21':{c:'c-mx',b:'b17',h:'Jeudi 21 mai — J-11',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Relecture fiches — 30 min par matière',d:''}],n:''},
+  '2026-05-22':{c:'c-ex',b:'b12',h:'Vendredi 22 mai — J-10',av:'Dispo dès 12h',t:[{tm:'12h–17h30',s:'sp-ex',ti:'DERNIERS BLANCS IS + SOC',d:'Conditions réelles'},{tm:'18h–20h',s:'sp-ex',ti:'Correction + bilan final',d:''}],n:'J-10 — derniers examens blancs.'},
+  '2026-05-23':{c:'c-ex',b:'bl',h:'Samedi 23 mai — J-9',av:'Toute la journée',t:[{tm:'9h–14h',s:'sp-ex',ti:'DERNIERS BLANCS AR + FR + corrections',d:''},{tm:'15h–17h',s:'sp-ex',ti:'Bilan global — liste points critiques',d:''}],n:'J-9 — derniers blancs. Après : légère seulement.'},
+  '2026-05-24':{c:'c-mx',b:'bl',h:'Dimanche 24 mai — J-8',av:'Toute la journée',t:[{tm:'9h–12h',s:'sp-ex',ti:'Révision ciblée ultime — lacunes critiques',d:''},{tm:'13h–18h',s:'sp-ex',ti:'IS القرآن + SOC données + AR/FR fiches',d:''}],n:'J-8 — dernière journée intense.'},
+  '2026-05-25':{c:'c-mx',b:'b17',h:'Lundi 25 mai — J-7',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Relecture fiches ultra — 1h par matière',d:''}],n:'J-7 — une semaine pile.'},
+  '2026-05-26':{c:'c-mx',b:'b17',h:'Mardi 26 mai — J-6',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Relecture fiches AR + FR + citations romans',d:''}],n:''},
+  '2026-05-27':{c:'c-mx',b:'b12',h:'Mercredi 27 mai — J-5',av:'Dispo dès 12h',t:[{tm:'12h–19h30',s:'sp-ex',ti:'Relecture douce toutes matières — 2h par matière',d:'Calme, sans pression'}],n:'J-5 — journée douce.'},
+  '2026-05-28':{c:'c-mx',b:'b17',h:'Jeudi 28 mai — J-4',av:'Dispo 17h–21h',t:[{tm:'17h–21h',s:'sp-ex',ti:'Relecture fiches — 30 min par matière',d:''}],n:'J-4 — reste zen.'},
+  '2026-05-29':{c:'c-mx',b:'b12',h:'Vendredi 29 mai — J-3',av:'Dispo dès 12h',t:[{tm:'12h–16h',s:'sp-ex',ti:'Tour complet toutes fiches ultra',d:'1h par matière'},{tm:'16h30–19h',s:'sp-ex',ti:'Préparer le matériel examen',d:'Stylos, carte ID, convocation, réveil'}],n:'J-3 — après aujourd\'hui : repos.'},
+  '2026-05-30':{c:'c-rs',b:'br',h:'Samedi 30 mai — J-2',av:'Toute la journée',t:[{tm:'Matin',s:'sp-ex',ti:'Relecture légère 1h max',d:'Fiches uniquement'},{tm:'Reste',s:'sp-ex',ti:'REPOS TOTAL',d:'Sortie, détente, sommeil'}],n:'J-2 — REPOS. Le travail est fait.'},
+  '2026-05-31':{c:'c-rs',b:'br',h:'Dimanche 31 mai — VEILLE',av:'Toute la journée',t:[{tm:'Matin',s:'sp-ex',ti:'30 min max — feuilleter les fiches',d:''},{tm:'Reste',s:'sp-ex',ti:'Repos total — coucher avant 22h',d:'8h de sommeil minimum'}],n:'VEILLE. Mange bien, dors tôt. Tu es prêt.'},
+  '2026-06-01':{c:'c-xm',b:'bx',h:'Lundi 1er juin 2026 — EXAMEN RÉGIONAL',av:'Grand jour',t:[{tm:'Matin',s:'sp-ex',ti:'Réveil 1h30 avant — petit déjeuner',d:''},{tm:'Examen',s:'sp-ex',ti:'Lis tout le sujet avant d\'écrire',d:'5 min de planification — commence par ce que tu maîtrises'},{tm:'Fin',s:'sp-ex',ti:'10 min relecture finale',d:''}],n:'6 semaines de travail. 12+ examens blancs. Tu es prêt. Confiance totale.'},
+};
+
+const WEEKS=[
+  {l:'Semaine 1 — IS complet (18-24 avr)',ph:'Phase 1',phc:'p0',sprint:false,d:['2026-04-18','2026-04-19','2026-04-20','2026-04-21','2026-04-22','2026-04-23','2026-04-24']},
+  {l:'Semaine 2 — SOC + AR + FR (25 avr–1 mai)',ph:'Phase 1',phc:'p0',sprint:false,d:['2026-04-25','2026-04-26','2026-04-27','2026-04-28','2026-04-29','2026-04-30','2026-05-01']},
+  {l:'Semaine 3 — Consolidation (2-3 mai)',ph:'Transition',phc:'p0',sprint:false,d:['2026-05-02','2026-05-03',null,null,null,null,null]},
+  {l:'SPRINT 7 JOURS LIBRES (4-10 mai) — Examens blancs + Annales',ph:'SPRINT',phc:'p1',sprint:true,d:['2026-05-04','2026-05-05','2026-05-06','2026-05-07','2026-05-08','2026-05-09','2026-05-10']},
+  {l:'Semaine 5 — Entretien + Nouveaux blancs (11-17 mai)',ph:'Phase 2',phc:'p2',sprint:false,d:['2026-05-11','2026-05-12','2026-05-13','2026-05-14','2026-05-15','2026-05-16','2026-05-17']},
+  {l:'Semaine 6 — Révision ciblée + Blancs finaux (18-24 mai)',ph:'Phase 3',phc:'p3',sprint:false,d:['2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22','2026-05-23','2026-05-24']},
+  {l:'Dernière semaine — Révision légère + Repos (25-31 mai)',ph:'Final',phc:'p4',sprint:false,d:['2026-05-25','2026-05-26','2026-05-27','2026-05-28','2026-05-29','2026-05-30','2026-05-31']},
+  {l:'1er juin — EXAMEN RÉGIONAL',ph:'EXAM',phc:'p4',sprint:false,d:['2026-06-01',null,null,null,null,null,null]},
+];
+
+const DN=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+function gD(ds){return ds?new Date(ds+'T12:00:00').getDate():'';}
+function gDW(ds){return ds?DN[new Date(ds+'T12:00:00').getDay()]:'';}
+function gM(ds){if(!ds)return'';const m=new Date(ds+'T12:00:00').getMonth();return['jan','fév','mar','avr','mai','jun'][m]||'';}
+
+function buildCal(){
+  const wc=document.getElementById('wc');
+  WEEKS.forEach(wk=>{
+    const el=document.createElement('div');
+    el.className='wk'+(wk.sprint?' sprint':'');
+    el.innerHTML=`<div class="wk-h"><span>${wk.l}</span><span class="wk-ph ${wk.phc}">${wk.ph}</span></div>`;
+    const row=document.createElement('div');row.className='wk-days';
+    wk.d.forEach(date=>{
+      const cell=document.createElement('div');
+      if(!date){cell.className='day empty-d';cell.style.background='none';row.appendChild(cell);return;}
+      const p=P[date];
+      const c=p?p.c:'c-mx',b=p?p.b:'bl';
+      const bl=b==='bs'?'SPRINT':b==='b17'?'17h+':b==='b12'?'12h+':b==='bl'?'libre':b==='bx'?'EXAM':b==='br'?'repos':'';
+      const todayStr=new Date().toISOString().split('T')[0];
+      cell.className='day '+c+(date===todayStr?' tod':'');
+      cell.dataset.date=date;
+      cell.innerHTML=`<div class="dn">${gDW(date)}</div><div class="dd">${gD(date)}</div><div class="db ${b}">${bl}</div><div class="dm">${gM(date)}</div>`;
+      cell.onclick=()=>selDay(date);
+      row.appendChild(cell);
+    });
+    el.appendChild(row);wc.appendChild(el);
+  });
+}
+
+function selDay(date){
+  document.querySelectorAll('.day.sel').forEach(d=>d.classList.remove('sel'));
+  const el=document.querySelector(`[data-date="${date}"]`);
+  if(el)el.classList.add('sel');
+  const p=P[date],det=document.getElementById('det');
+  if(!p){det.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--color-text-tertiary)">Pas de données</div>';return;}
+  const ts=p.t.map(t=>`<div class="task"><div class="t-tm">${t.tm}</div><div class="t-b"><div class="t-ti"><span class="sp ${t.s}">${t.s==='sp-is'?'IS':t.s==='sp-soc'?'SOC':t.s==='sp-ar'?'AR':t.s==='sp-fr'?'FR':'Bilan'}</span>${t.ti}</div>${t.d?`<div class="t-s">${t.d}</div>`:''}</div></div>`).join('');
+  det.innerHTML=`<div class="det-h">${p.h}</div><div class="det-av">⏰ ${p.av}</div>${ts}${p.n?`<div class="det-n">${p.n}</div>`:''}`;
+}
+
+// Start app
+init();
+</script>
+</body>
+</html>

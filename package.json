@@ -1,0 +1,17 @@
+{
+  "name": "bac2026-revision-planner",
+  "version": "1.0.0",
+  "description": "Outil de révision Bac 2026 — Calendrier + Todo list",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'No build needed'"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-session": "^1.18.0"
+  }
+}
